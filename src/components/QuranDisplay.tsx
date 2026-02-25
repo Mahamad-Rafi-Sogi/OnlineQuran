@@ -365,7 +365,7 @@ ${translation?.text || ''}
         }
       } else {
         // Navigate to surah
-        setSurahNumber(suggestion.surah.number);
+        setSurahNumber(selected.surah.number);
         setSearchQuery('');
         setShowSuggestions(false);
         setSelectedSuggestionIndex(-1);
