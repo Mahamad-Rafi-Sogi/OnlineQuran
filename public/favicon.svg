@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background Circle -->
+  <circle cx="50" cy="50" r="48" fill="#064e3b" stroke="#d97706" stroke-width="2"/>
+  
+  <!-- Islamic Star Pattern -->
+  <path d="M50 20 L55 35 L70 35 L58 45 L63 60 L50 50 L37 60 L42 45 L30 35 L45 35 Z" fill="#d97706" opacity="0.8"/>
+  
+  <!-- Crescent Moon -->
+  <path d="M65 25 Q75 30 75 40 Q75 50 65 55 Q70 50 70 40 Q70 30 65 25 Z" fill="#fbbf24"/>
+  
+  <!-- Star -->
+  <circle cx="78" cy="28" r="3" fill="#fbbf24"/>
+  
+  <!-- Arabic Calligraphy Style Circle -->
+  <circle cx="50" cy="50" r="15" fill="none" stroke="#d97706" stroke-width="1.5"/>
+  <circle cx="50" cy="50" r="20" fill="none" stroke="#d97706" stroke-width="0.5" opacity="0.5"/>
+</svg>

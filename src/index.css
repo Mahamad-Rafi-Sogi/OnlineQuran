@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Georgia', serif;
+  line-height: 1.5;
+  font-weight: 400;
+  
+  color-scheme: light;
+  color: rgba(0, 0, 0, 0.87);
+  background: linear-gradient(135deg, #fdfbf7 0%, #f5efe0 50%, #fdfbf7 100%);
+  
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(6, 78, 59, 0.05) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(217, 119, 6, 0.05) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(180, 83, 9, 0.02) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Arabic text styling */
+.arabic-text {
+  font-family: 'Amiri Quran', serif;
+  font-size: 1.75rem;
+  line-height: 2.5rem;
+  direction: rtl;
+  text-align: right;
+}
+
+/* Islamic ornamental border */
+.islamic-border {
+  border: 3px solid;
+  border-image: linear-gradient(45deg, #064e3b, #d97706, #064e3b) 1;
+  position: relative;
+}
+
+.islamic-border::before,
+.islamic-border::after {
+  content: '◈';
+  position: absolute;
+  color: #d97706;
+  font-size: 1.5rem;
+}
+
+.islamic-border::before {
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.islamic-border::after {
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Decorative corners */
+.corner-ornament {
+  position: relative;
+}
+
+.corner-ornament::before {
+  content: '✦';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  color: #d97706;
+  font-size: 1.2rem;
+}
+
+.corner-ornament::after {
+  content: '✦';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  color: #d97706;
+  font-size: 1.2rem;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Islamic geometric pattern */
+.islamic-pattern {
+  background-image: repeating-linear-gradient(
+    45deg,
+    #064e3b 0,
+    #064e3b 10px,
+    transparent 10px,
+    transparent 20px
+  ),
+  repeating-linear-gradient(
+    -45deg,
+    #064e3b 0,
+    #064e3b 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  opacity: 0.05;
+}
+
+/* Ayah number circle */
+.ayah-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: bold;
+  margin: 0 0.5rem;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card shadow */
+.card-islamic {
+  box-shadow: 
+    0 4px 6px rgba(6, 78, 59, 0.1),
+    0 2px 4px rgba(217, 119, 6, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Enhanced scrollbar for Islamic theme */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(to bottom, #fdfbf7, #f5f1e8);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+  border-radius: 10px;
+  border: 2px solid #fdfbf7;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #059669 0%, #064e3b 100%);
+}
+
+/* Smooth animations */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Enhanced hover effects */
+table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(6, 78, 59, 0.03) 0%, rgba(217, 119, 6, 0.03) 100%) !important;
+  transform: scale(1.002);
+  transition: all 0.2s ease;
+}
+
+/* Subtle glow for Islamic elements */
+.islamic-glow {
+  box-shadow: 
+    0 0 10px rgba(6, 78, 59, 0.1),
+    0 0 20px rgba(217, 119, 6, 0.05),
+    0 0 30px rgba(6, 78, 59, 0.03);
+}
