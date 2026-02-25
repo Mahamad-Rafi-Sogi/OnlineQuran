@@ -54,6 +54,8 @@ const QuranDisplay: React.FC = () => {
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const ayahRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -302,6 +304,96 @@ ${translation?.text || ''}
     return matchesFavorite && matchesSearch;
   });
 
+  // Generate search suggestions (top 5 matches from verses + surah names)
+  const searchSuggestions = searchQuery.trim().length >= 2 ? (() => {
+    const query = searchQuery.toLowerCase().trim();
+    
+    // Search in current surah verses
+    const verseSuggestions = arabicAyahs
+      .map((ayah, index) => ({
+        type: 'verse' as const,
+        ayah,
+        index,
+        translationText: englishTranslationAyahs[index]?.text || '',
+        translitText: englishTranslitAyahs[index]?.text || '',
+        arabicText: arabicAyahs[index]?.text || ''
+      }))
+      .filter(item => {
+        return item.translationText.toLowerCase().includes(query) ||
+               item.translitText.toLowerCase().includes(query) ||
+               item.arabicText.includes(searchQuery.trim());
+      })
+      .slice(0, 3);
+    
+    // Search in surah names
+    const surahSuggestions = SURAH_LIST
+      .filter(surah => 
+        surah.name.toLowerCase().includes(query) ||
+        surah.translation.toLowerCase().includes(query)
+      )
+      .slice(0, 2)
+      .map(surah => ({
+        type: 'surah' as const,
+        surah
+      }));
+    
+    return [...verseSuggestions, ...surahSuggestions];
+  })() : [];
+
+  // Handle keyboard navigation for suggestions
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || searchSuggestions.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => 
+        prev < searchSuggestions.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+    } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+      e.preventDefault();
+      const selected = searchSuggestions[selectedSuggestionIndex];
+      if (selected.type === 'verse') {
+        setSearchQuery(selected.translationText.substring(0, 50));
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        // Scroll to the ayah
+        if (ayahRefs.current[selected.index]) {
+          ayahRefs.current[selected.index]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        // Navigate to surah
+        setSurahNumber(suggestion.surah.number);
+        setSearchQuery('');
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: typeof searchSuggestions[0]) => {
+    if (suggestion.type === 'verse') {
+      setSearchQuery(suggestion.translationText.substring(0, 50));
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+      // Scroll to the ayah
+      if (ayahRefs.current[suggestion.index]) {
+        ayahRefs.current[suggestion.index]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else {
+      // Navigate to surah
+      setSurahNumber(suggestion.surah.number);
+      setSearchQuery('');
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    }
+  };
+
   return (
     <div className={`min-h-screen py-4 md:py-8 relative overflow-hidden transition-colors duration-300 ${
       darkMode ? 'bg-gray-900' : ''
@@ -453,19 +545,102 @@ ${translation?.text || ''}
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="mb-4 md:mb-6 max-w-md mx-auto">
+          {/* Search Bar with Suggestions */}
+          <div className="mb-4 md:mb-6 max-w-2xl mx-auto relative">
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="🔍 Search verses..."
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowSuggestions(e.target.value.trim().length >= 2);
+                setSelectedSuggestionIndex(-1);
+              }}
+              onKeyDown={handleSearchKeyDown}
+              onFocus={() => searchQuery.trim().length >= 2 && setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+              placeholder="🔍 Search verses... (type 2+ characters)"
               className={`w-full px-4 py-3 text-base rounded-lg border-2 ${
                 darkMode 
                   ? 'bg-gray-800 text-white border-quran-gold placeholder-gray-500' 
                   : 'bg-white text-gray-800 border-quran-green placeholder-gray-400'
               } focus:outline-none focus:ring-4 focus:ring-quran-gold/30 transition-all shadow`}
             />
+            
+            {/* Suggestions Dropdown */}
+            {showSuggestions && searchSuggestions.length > 0 && (
+              <div className={`absolute z-50 w-full mt-2 rounded-lg shadow-2xl border-2 max-h-96 overflow-y-auto ${
+                darkMode 
+                  ? 'bg-gray-800 border-quran-gold/50' 
+                  : 'bg-white border-quran-green'
+              }`}>
+                {searchSuggestions.map((suggestion, idx) => (
+                  <div
+                    key={suggestion.type === 'verse' ? `${suggestion.ayah.number}-${idx}` : `surah-${suggestion.surah.number}`}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className={`px-4 py-3 cursor-pointer border-b transition-colors ${
+                      darkMode ? 'border-gray-700' : 'border-gray-200'
+                    } ${
+                      idx === selectedSuggestionIndex
+                        ? darkMode ? 'bg-quran-gold/20' : 'bg-quran-green/10'
+                        : darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    {suggestion.type === 'verse' ? (
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-medium mb-1 ${
+                            darkMode ? 'text-quran-gold' : 'text-quran-green'
+                          }`}>
+                            Verse {suggestion.ayah.numberInSurah}
+                          </p>
+                          <p className={`text-sm line-clamp-2 ${
+                            darkMode ? 'text-gray-300' : 'text-gray-700'
+                          }`}>
+                            {suggestion.translationText}
+                          </p>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
+                          darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          #{suggestion.ayah.numberInSurah}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-bold mb-1 ${
+                            darkMode ? 'text-quran-gold' : 'text-quran-green'
+                          }`}>
+                            📖 Surah {suggestion.surah.number}: {suggestion.surah.name}
+                          </p>
+                          <p className={`text-xs ${
+                            darkMode ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            {suggestion.surah.translation} • {SURAH_VERSE_COUNTS[suggestion.surah.number]} verses
+                          </p>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
+                          darkMode ? 'bg-quran-gold/20 text-quran-gold' : 'bg-quran-green/20 text-quran-green'
+                        }`}>
+                          Go to Surah
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* No Results Message */}
+            {showSuggestions && searchQuery.trim().length >= 2 && searchSuggestions.length === 0 && (
+              <div className={`absolute z-50 w-full mt-2 rounded-lg shadow-2xl border-2 px-4 py-6 text-center ${
+                darkMode 
+                  ? 'bg-gray-800 border-quran-gold/50 text-gray-400' 
+                  : 'bg-white border-quran-green text-gray-500'
+              }`}>
+                <p>No verses found matching "{searchQuery}"</p>
+              </div>
+            )}
           </div>
 
           <div className="inline-block px-6 md:px-10 py-4 md:py-5 text-base md:text-xl font-bold text-white rounded-3xl bg-gradient-to-r from-quran-green via-emerald-600 to-quran-green shadow-2xl border-2 border-quran-gold/40" style={{ boxShadow: '0 8px 20px rgba(6, 78, 59, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)' }}>
