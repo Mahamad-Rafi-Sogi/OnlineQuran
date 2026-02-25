@@ -32,11 +32,11 @@ const QuranDisplay: React.FC = () => {
     const saved = localStorage.getItem('darkMode');
     return saved === 'true';
   });
-  const [arabicFontSize, setArabicFontSize] = useState(() => {
+  const [arabicFontSize] = useState(() => {
     const saved = localStorage.getItem('arabicFontSize');
     return saved ? parseInt(saved) : 28;
   });
-  const [translationFontSize, setTranslationFontSize] = useState(() => {
+  const [translationFontSize] = useState(() => {
     const saved = localStorage.getItem('translationFontSize');
     return saved ? parseInt(saved) : 16;
   });
