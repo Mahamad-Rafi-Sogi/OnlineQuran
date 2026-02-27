@@ -774,16 +774,17 @@ ${translation?.text || ''}
         )}
 
         {/* 3-Column Mushaf Layout */}
-        <div className={`overflow-x-auto shadow-2xl rounded-3xl border-4 border-quran-gold/40 card-islamic relative ${
+        <div className={`shadow-2xl rounded-3xl border-4 border-quran-gold/40 card-islamic relative ${
           darkMode 
             ? 'bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800' 
             : 'bg-gradient-to-br from-white via-amber-50/40 to-white'
         }`}>
           {/* Decorative corner elements */}
-          <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-quran-gold rounded-tl-3xl"></div>
-          <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-quran-gold rounded-tr-3xl"></div>
+          <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-quran-gold rounded-tl-3xl pointer-events-none z-10"></div>
+          <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-quran-gold rounded-tr-3xl pointer-events-none z-10"></div>
           
-          <table className="w-full border-collapse min-w-[800px]">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse min-w-[800px]">
             <thead>
               <tr className="text-white" style={{
                 background: 'linear-gradient(90deg, #064e3b 0%, #047857 25%, #059669 50%, #047857 75%, #064e3b 100%)'
@@ -847,6 +848,7 @@ ${translation?.text || ''}
               })}
             </tbody>
           </table>
+          </div>
         </div>
 
         {/* Footer */}
